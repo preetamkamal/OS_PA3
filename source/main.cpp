@@ -6,42 +6,48 @@
 #include "../headers/StatUpdater.h"
 using namespace std;
 
-int main(int argc, char* argv[]) {
-    //initial args validation
-    if(argc < 4){
+int main(int argc, char *argv[])
+{
+    // initial args validation
+    if (argc < 4)
+    {
         cout << "Not enough arguments sent to main." << endl;
         cout << "Format should be: ./lab2 inputfile outputfile algorithm timequantum(if algorithm == 2)" << endl;
         return EXIT_FAILURE;
     }
-     int algorithm = atoi(argv[3]);
+    int algorithm = atoi(argv[3]);
 
-    if((algorithm == 2 || algorithm == 3) && argc == 4){
+    if ((algorithm == 2 || algorithm == 3) && argc == 4)
+    {
         cout << "Need to provide time quantum when using Round Robin algorithm" << endl;
         return EXIT_FAILURE;
     }
-    //variables to hold initial arguments
-    // int algorithm = atoi(argv[3]) ;
+    // variables to hold initial arguments
+    //  int algorithm = atoi(argv[3]) ;
     int timeq = -1;
-    if(algorithm == 2 || algorithm == 3) {
+    if (algorithm == 2 || algorithm == 3)
+    {
         timeq = atoi(argv[4]);
     }
 
-    //queues to hold PCBs throughout
+    // queues to hold PCBs throughout
     auto ready_queue = new DList<PCB>();
     auto finished_queue = new DList<PCB>();
-
-    try {
-        //all the objects that will work together to simulate OS process management
+    auto blocked_queue = new DList<PCB>();
+    try
+    {
+        // all the objects that will work together to simulate OS process management
         Clock clock;
         PCBGenerator pgen(argv[1], ready_queue, &clock);
-        StatUpdater stats(ready_queue, finished_queue, &clock, algorithm, argv[2], timeq);
-        CPU cpu(finished_queue, &clock);
+        StatUpdater stats(ready_queue, finished_queue, blocked_queue, &clock, algorithm, argv[2], timeq);
+        CPU cpu(finished_queue, blocked_queue, &clock, timeq); // Pass timeq to CPU
         Scheduler scheduler(ready_queue, &cpu, algorithm, timeq);
         Dispatcher dispatcher(&cpu, &scheduler, ready_queue, &clock);
         scheduler.setdispatcher(&dispatcher);
 
-        //loop will continue until no more processes are going to be generated, no more in ready queue, and cpu is done
-        while (!pgen.finished() || ready_queue->size() || !cpu.isidle()) {
+        // loop will continue until no more processes are going to be generated, no more in ready queue, and cpu is done
+        while (!pgen.finished() || ready_queue->size() || !cpu.isidle() || blocked_queue->size())
+        {
             pgen.generate();
             scheduler.execute();
             dispatcher.execute();
@@ -50,12 +56,14 @@ int main(int argc, char* argv[]) {
             clock.step();
         }
 
-        //final printing of stats
+        // final printing of stats
         stats.print();
-
-    }catch(int){
+    }
+    catch (int)
+    {
         delete ready_queue;
         delete finished_queue;
+        delete blocked_queue;
         return EXIT_FAILURE;
     }
 

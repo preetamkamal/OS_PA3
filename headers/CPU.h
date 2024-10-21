@@ -6,22 +6,26 @@
 #include "Clock.h"
 #include "Schedulers.h"
 
-//forward declaration so that CPU can declare dispatcher as friend
 class Dispatcher;
 
-class CPU{
+class CPU
+{
 private:
     PCB *pcb;
     bool idle;
     Clock *clock;
-    DList<PCB> *finished_queue; //for terminated process, used later by statupdater
-    friend Dispatcher; //allows dispatcher to switch out processes
+    DList<PCB> *finished_queue; // For terminated processes
+    DList<PCB> *blocked_queue;  // For blocked processes
+    int timeq;                  // Time quantum
+    friend Dispatcher;
+
 public:
-    CPU(DList<PCB> *fq, Clock *cl);
-    PCB* getpcb();
+    CPU(DList<PCB> *fq, DList<PCB> *bq, Clock *cl, int tq);
+    PCB *getpcb();
     bool isidle();
     void execute();
     void terminate();
+    void block(); // Method to handle blocking
 };
 
 #endif

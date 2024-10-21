@@ -17,12 +17,13 @@ class StatUpdater{
 private:
     DList<PCB> *ready_queue;
     DList<PCB> *finished_queue;
+    DList<PCB> *blocked_queue; 
     Clock *clock;
     int algorithm, num_tasks, timeq;
     float last_update;
     std::string filename;
 public:
-    StatUpdater(DList<PCB> *rq, DList<PCB> *fq, Clock *cl, int alg, std::string fn, int tq);
+    StatUpdater(DList<PCB> *rq, DList<PCB> *fq, DList<PCB> *bq, Clock *cl, int alg, std::string fn, int tq);
     void execute();
     void print();
 };
