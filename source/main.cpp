@@ -13,14 +13,18 @@ int main(int argc, char* argv[]) {
         cout << "Format should be: ./lab2 inputfile outputfile algorithm timequantum(if algorithm == 2)" << endl;
         return EXIT_FAILURE;
     }
-    if(atoi(argv[3]) == 2 && argc == 4){
+     int algorithm = atoi(argv[3]);
+
+    if((algorithm == 2 || algorithm == 3) && argc == 4){
         cout << "Need to provide time quantum when using Round Robin algorithm" << endl;
         return EXIT_FAILURE;
     }
     //variables to hold initial arguments
-    int algorithm = atoi(argv[3]);
+    // int algorithm = atoi(argv[3]) ;
     int timeq = -1;
-    if(algorithm == 2) timeq = atoi(argv[4]);
+    if(algorithm == 2 || algorithm == 3) {
+        timeq = atoi(argv[4]);
+    }
 
     //queues to hold PCBs throughout
     auto ready_queue = new DList<PCB>();

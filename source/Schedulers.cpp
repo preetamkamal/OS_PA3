@@ -106,7 +106,13 @@ void Scheduler::pp() {
     int low_index = -1;
 
     //if cpu is idle, set next pcb in queue as lowest priority initially
-    if(!cpu->isidle()) low_prio = cpu->getpcb()->priority;
+    if(!cpu->isidle()) {
+        low_prio = cpu->getpcb()->priority;
+        if(timer <= 0){
+            timer = timeq;
+            dispatcher->interrupt();
+        }
+    }
     else{
         low_prio = ready_queue->gethead()->priority;
         low_index = 0;
@@ -123,6 +129,9 @@ void Scheduler::pp() {
 
     //only -1 if couldn't find a pcb to schedule, happens if cpu is already working on lowest priority
     if(low_index >= 0){
+        if(timeq != -1) {
+            timer = timeq
+        };
         next_pcb_index = low_index;
         dispatcher->interrupt();
     }
